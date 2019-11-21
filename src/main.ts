@@ -1,26 +1,18 @@
-#!/usr/bin/env node
+import yargs from 'yargs';
+import * as commands from './cli/commands';
 
-import Command from './cli/command'
-import Start from './cli/start'
-import Stop from './cli/stop'
+export default function (): void {
+  const argv = yargs
+    .command('start [issue]', 'Start work log', () => {}, commands.start)
+    .command('stop', 'Stop work log', () => {}, commands.stop)
+    .command('cancel', 'Cancel work log', () => {}, commands.cancel)
+    .strict()
+    .help()
+    .alias('h', 'help')
+    .recommendCommands()
+    .parse();
 
-function main() {
-  let command: Command
-
-  switch (process.argv[2]) {
-  case void 0:
-  case 'start':
-    command = new Start()
-    break
-  case 'stop':
-    command = new Stop()
-    break
-  default:
-    console.error(`No such command: ${process.argv[2]}`)
-    return
+  if (argv._.length === 0) {
+    commands.start(argv);
   }
-
-  command.run(process.argv.slice(3))
 }
-
-main()

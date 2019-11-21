@@ -1,18 +1,18 @@
-import { exec } from './shell'
+import { spawn } from './shell';
 
 export function start(project: string): void {
-  exec('watson stop', { inheritStdout: true, ignoreErrors: true })
-  exec(`watson start ${project}`, { inheritStdout: true, inheritStderr: true })
+  spawn('watson', ['stop'], { silent: true });
+  spawn('watson', ['start', project]);
 }
 
 export function stop(): void {
-  try {
-    exec('watson stop', { inheritStdout: true, inheritStderr: true })
-  } catch (e) {
-    if (exec('watson status', { ignoreErrors: true }) !== 'No project started.\n') {
-      throw e
-    }
-  }
+  spawn('watson', ['stop']);
 }
 
-export default { start, stop }
+export function cancel(): void {
+  spawn('watson', ['cancel']);
+}
+
+export function showInstallationHelp(): void {
+  console.error('Please make sure Watson is installed.\n\nTo install Watson, run `brew install watson` or `pip install td-watson`');
+}

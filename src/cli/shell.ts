@@ -1,32 +1,32 @@
-import child_process from 'child_process'
+import childProcess, { SpawnSyncReturns, SpawnSyncOptions, SpawnSyncOptionsWithStringEncoding } from 'child_process';
 
-export interface ExecOptions {
-  inheritStdout?: boolean
-  inheritStderr?: boolean
-  ignoreErrors?: boolean
+function spawnWithOptions(
+  command: string,
+  args: string[],
+  options: SpawnSyncOptions,
+): SpawnSyncReturns<string> {
+  const result = childProcess.spawnSync(command, args, {
+    encoding: 'utf-8',
+    ...options,
+  } as SpawnSyncOptionsWithStringEncoding);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result;
 }
 
-export function exec(command: string, options?: ExecOptions): string {
-  const mergedOptions: ExecOptions = Object.assign({
-    inheritStdout: false,
-    inheritStderr: false,
-    ignoreErrors: false,
-  }, options)
+export function spawn(
+  command: string,
+  args?: string[],
+  options?: { silent?: boolean },
+): SpawnSyncReturns<string> {
+  return spawnWithOptions(command, args || [], {
+    stdio: options && options.silent ? 'pipe' : 'inherit',
+  });
+}
 
-  try {
-    return child_process.execSync(command, {
-      encoding: 'utf-8',
-      stdio: [
-        'ignore',
-        mergedOptions.inheritStdout ? 'inherit' : 'pipe',
-        mergedOptions.inheritStderr ? 'inherit' : 'pipe',
-      ],
-    })
-  } catch (e) {
-    if (mergedOptions.ignoreErrors) {
-      return e.stdout
-    }
-
-    throw e
-  }
+export function exec(command: string): string {
+  return spawnWithOptions(command, [], { shell: true }).stdout;
 }
