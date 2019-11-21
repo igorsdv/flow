@@ -5,7 +5,7 @@ export default function (): void {
   const argv = yargs
     .command(
       'start [issue]',
-      'Start work log',
+      'Start work log (default command)',
       (yargs) => {
         yargs
           .positional('issue', {
@@ -19,13 +19,15 @@ export default function (): void {
       commands.start,
     )
     .command('stop', 'Stop work log', () => {}, commands.stop)
-    .command('cancel', 'Cancel work log', () => {}, commands.cancel)
+    .command('cancel', 'Delete active work log', () => {}, commands.cancel)
+    .command('setup', 'Set up API credentials', () => {}, commands.setup)
     .strict()
     .help()
     .alias('h', 'help')
     .example('$0', 'Start work log for the issue determined by the current Git branch')
     .example('$0 start ABSO-1', 'Start work log for ABSO-1')
     .recommendCommands()
+    .completion('completion', 'Generate shell completion script')
     .wrap(90)
     .parse();
 

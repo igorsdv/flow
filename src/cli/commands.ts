@@ -1,4 +1,5 @@
 import { Arguments } from 'yargs';
+import * as config from '../config';
 import * as issueParser from './issue-parser';
 import * as watson from './watson';
 
@@ -30,5 +31,13 @@ export function cancel(): void {
     watson.cancel();
   } catch (e) {
     watson.showInstallationHelp();
+  }
+}
+
+export async function setup(): Promise<void> {
+  try {
+    await config.setup();
+  } catch (e) {
+    console.error(e.message);
   }
 }

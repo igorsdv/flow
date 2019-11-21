@@ -27,7 +27,6 @@ async function getIssueFromInput(): Promise<string> {
   }).then(({ issue }) => issue as string);
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export async function getIssueFromContext(input?: string): Promise<string> {
   if (input !== undefined) {
     const result = validateIssueKey(input);
