@@ -15,28 +15,31 @@ function getIssueFromGitBranch(): string | null {
   const command = 'git branch | grep "^*" | egrep -o "[A-Z]+-[0-9]+"';
   const issues = exec(command).trim().split('\n');
 
-  return issues.length === 1 ? issues[0] : null;
+  return issues.length === 1 && issues[0] || null;
 }
 
-async function getIssueFromInput(): Promise<string> {
+async function getIssueFromInput(defaultValue: string | null): Promise<string> {
   return inquirer.prompt({
     name: 'issue',
     message: 'Please enter the issue key:',
     validate: validateIssueKey,
     filter: filterIssueKey,
+    default: defaultValue,
   }).then(({ issue }) => issue as string);
 }
 
-export async function getIssueFromContext(input?: string): Promise<string> {
-  if (input !== undefined) {
-    const result = validateIssueKey(input);
+export async function getIssueFromArgument(input: string): Promise<string> {
+  const result = validateIssueKey(input);
 
-    if (result === true) {
-      return filterIssueKey(input);
-    }
-
-    throw result;
+  if (result === true) {
+    return filterIssueKey(input);
   }
 
-  return getIssueFromGitBranch() || getIssueFromInput();
+  throw result;
+}
+
+export async function getIssueFromContext(noInteraction: boolean): Promise<string> {
+  const issue = getIssueFromGitBranch();
+
+  return noInteraction ? getIssueFromArgument(issue || '') : getIssueFromInput(issue);
 }

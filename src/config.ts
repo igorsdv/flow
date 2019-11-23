@@ -46,6 +46,7 @@ export async function setup(): Promise<void> {
     {
       name: 'email',
       message: 'Please enter your email:',
+      default: `${os.userInfo().username}@absolunet.com`,
     },
     {
       name: 'jiraApiToken',

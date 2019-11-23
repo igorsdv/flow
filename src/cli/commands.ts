@@ -1,18 +1,26 @@
 import { Arguments } from 'yargs';
 import * as config from '../config';
-import * as issueParser from './issue-parser';
+import { getIssueFromArgument, getIssueFromContext } from './issue-parser';
 import * as watson from './watson';
+import pushOperation from './push-operation';
 
-export async function start(argv: Arguments<{ issue?: string }>): Promise<void> {
-  const issue = await issueParser.getIssueFromContext(argv.issue)
+interface Options {
+  issue?: string;
+  noInteraction: boolean;
+}
+
+export async function start(argv: Arguments<Options>): Promise<void> {
+  const { issue, noInteraction } = argv;
+  const issueKey = await (issue ? getIssueFromArgument(issue) : getIssueFromContext(noInteraction))
     .catch((e) => console.error(e));
 
-  if (issue === undefined) {
+  if (issueKey === undefined) {
     return;
   }
 
   try {
-    watson.start(issue);
+    watson.stop({ silent: 'error' });
+    watson.start(issueKey);
   } catch (e) {
     watson.showInstallationHelp();
   }
@@ -39,5 +47,24 @@ export async function setup(): Promise<void> {
     await config.setup();
   } catch (e) {
     console.error(e.message);
+  }
+}
+
+export async function push(): Promise<void> {
+  let frames: watson.Frame[];
+
+  try {
+    watson.stop({ silent: 'error' });
+    frames = watson.getPendingFrames();
+  } catch (e) {
+    watson.showInstallationHelp();
+    return;
+  }
+
+  try {
+    pushOperation(frames);
+  } catch (e) {
+    console.error(e.message);
+    console.error('\nPlease make sure to run `flow setup` and enter the correct credentials.');
   }
 }

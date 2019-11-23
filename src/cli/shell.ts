@@ -20,10 +20,12 @@ function spawnWithOptions(
 export function spawn(
   command: string,
   args?: string[],
-  options?: { silent?: boolean },
+  options?: { silent?: true | false | 'error' },
 ): SpawnSyncReturns<string> {
   return spawnWithOptions(command, args || [], {
-    stdio: options && options.silent ? 'pipe' : 'inherit',
+    stdio: (options || {}).silent === 'error'
+      ? ['inherit', 'inherit', 'pipe']
+      : (options || {}).silent ? 'pipe' : 'inherit',
   });
 }
 

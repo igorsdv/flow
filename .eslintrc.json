@@ -20,8 +20,15 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "func-names": "off",
+        "import/prefer-default-export": "off",
         "no-console": "off",
+        "no-mixed-operators": "off",
+        "no-nested-ternary": "off",
+        "no-restricted-syntax": "off",
         "no-shadow": "off",
-        "import/prefer-default-export": "off"
+        "object-curly-newline": ["error", {
+            "consistent": true
+        }]
     }
 }
