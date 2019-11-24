@@ -1,4 +1,4 @@
-import childProcess, { SpawnSyncReturns, SpawnSyncOptions, SpawnSyncOptionsWithStringEncoding } from 'child_process';
+import childProcess, { SpawnSyncOptions, SpawnSyncOptionsWithStringEncoding, SpawnSyncReturns } from 'child_process';
 
 function spawnWithOptions(
   command: string,

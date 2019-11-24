@@ -1,5 +1,5 @@
+import * as commands from 'flow/cli/commands';
 import yargs from 'yargs';
-import * as commands from './cli/commands';
 
 export default function (): void {
   const argv = yargs
@@ -34,7 +34,7 @@ export default function (): void {
     .alias('help', 'h')
     .example('$0', 'Start tracking time, prompting for the issue key')
     .example('$0 start -n', 'Start tracking time for the issue determined by the current Git branch')
-    .example('$0 start --help', 'Get detailed usage information for a command') 
+    .example('$0 start --help', 'Get detailed usage information for a command')
     .recommendCommands()
     // .wrap(90)
     .parse();

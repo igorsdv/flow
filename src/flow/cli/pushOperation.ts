@@ -1,10 +1,10 @@
+import * as jira from 'flow/client/jira';
+import * as tempo from 'flow/client/tempo';
+import DefaultMap from 'flow/defaultMap';
+import { Frame } from 'flow/cli/watson';
 import { edit } from 'external-editor';
 import inquirer from 'inquirer';
 import moment from 'moment';
-import { Frame } from './watson';
-import * as jira from '../client/jira';
-import * as tempo from '../client/tempo';
-import DefaultMap from './default-map';
 
 function validateIssues(
   issueKeys: string[],

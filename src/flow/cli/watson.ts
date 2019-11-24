@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { spawn } from './shell';
+import { spawn } from 'flow/cli/shell';
 
 const PENDING_TAG = 'flow.pending';
 const PUSHED_TAG = 'flow.pushed';

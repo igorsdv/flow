@@ -1,5 +1,5 @@
-import * as config from '../config';
-import lazyClient from './lazy-client';
+import * as config from 'flow/config';
+import lazyClient from 'flow/client/lazyClient';
 
 const client = lazyClient(() => {
   const { tempoApiToken } = config.load();

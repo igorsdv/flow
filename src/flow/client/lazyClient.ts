@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosInstance, AxiosStatic } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosStatic } from 'axios';
 
 export default function (configProvider: () => AxiosRequestConfig): AxiosStatic {
   let client: AxiosInstance | undefined;

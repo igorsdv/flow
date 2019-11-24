@@ -3,7 +3,7 @@
 '2019-11-20': # Monday
   # Application mobile - S'assurer de passer les devices ID lorsqu'un utilisa...
   SAQUMA-1565:
-    time: 1.75 # 1h 43m
+    time: 1.75 # 09:15 - 10:15, 11:00 - 12:00 (1h 43m)
     description: .
 
   # Application mobile - S'assurer de passer les devices ID lorsqu'un utilisa...

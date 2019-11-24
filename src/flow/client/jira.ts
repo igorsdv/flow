@@ -1,5 +1,5 @@
-import * as config from '../config';
-import lazyClient from './lazy-client';
+import * as config from 'flow/config';
+import lazyClient from 'flow/client/lazyClient';
 
 const client = lazyClient(() => {
   const { email, jiraApiToken } = config.load();
@@ -17,14 +17,12 @@ export interface UserDetails {
 }
 
 export interface IssueDetails {
-  [key: string]: {
-    account: {
-      id: number;
-      value: string;
-    } | null;
-    key: string;
-    summary: string;
-  };
+  key: string;
+  summary: string;
+  account: {
+    id: number;
+    value: string;
+  } | null;
 }
 
 export async function getUserDetails(): Promise<UserDetails> {
@@ -32,7 +30,7 @@ export async function getUserDetails(): Promise<UserDetails> {
   return { accountId };
 }
 
-export async function getIssueDetails(issueKeys: string[]): Promise<IssueDetails> {
+export async function getIssueDetails(issueKeys: string[]): Promise<Map<string, IssueDetails>> {
   const { data: { issues } } = await client.post<{
     issues: {
       key: string;
@@ -47,10 +45,9 @@ export async function getIssueDetails(issueKeys: string[]): Promise<IssueDetails
   }>('/search', {
     jql: `key IN (${issueKeys.join(',')})`,
     fields: ['summary', 'io.tempo.jira__account'],
-    fieldsByKeys: true,
   });
 
-  return issues.reduce((result: IssueDetails, {
+  const map = issues.reduce((result: { [key: string]: IssueDetails }, {
     key,
     fields: {
       'io.tempo.jira__account': account,
@@ -60,4 +57,6 @@ export async function getIssueDetails(issueKeys: string[]): Promise<IssueDetails
     [key]: { account, key, summary },
     ...result,
   }), {});
+
+  return new Map(Object.entries(map));
 }
