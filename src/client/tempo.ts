@@ -1,5 +1,5 @@
-import * as config from 'flow/config';
-import lazyClient from 'flow/client/lazyClient';
+import * as config from '../config';
+import lazyClient from './lazyClient';
 
 const client = lazyClient(() => {
   const { tempoApiToken } = config.load();
@@ -11,10 +11,10 @@ const client = lazyClient(() => {
   };
 });
 
-export async function getOpenAccountIds(): Promise<number[]> {
+export async function getOpenAccountIds(): Promise<Set<number>> {
   const { data: { results } } = await client.get<{
     results: { id: number }[];
   }>('/accounts', { params: { status: 'OPEN' } });
 
-  return results.map(({ id }) => id);
+  return new Set(results.map(({ id }) => id));
 }

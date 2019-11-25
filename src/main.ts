@@ -1,4 +1,4 @@
-import * as commands from 'flow/cli/commands';
+import * as commands from './cli/commands';
 import yargs from 'yargs';
 
 export default function (): void {

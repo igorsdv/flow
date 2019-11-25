@@ -1,5 +1,5 @@
-import * as config from 'flow/config';
-import lazyClient from 'flow/client/lazyClient';
+import * as config from '../config';
+import lazyClient from './lazyClient';
 
 const client = lazyClient(() => {
   const { email, jiraApiToken } = config.load();

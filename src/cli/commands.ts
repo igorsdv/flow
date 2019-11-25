@@ -1,8 +1,8 @@
-import * as config from 'flow/config';
-import * as watson from 'flow/cli/watson';
-import { getIssueFromArgument, getIssueFromContext } from 'flow/cli/issueParser';
+import * as config from '../config';
+import * as watson from './watson';
+import { getIssueFromArgument, getIssueFromContext } from './issueParser';
 import { Arguments } from 'yargs';
-import pushOperation from 'flow/cli/pushOperation';
+import pushOperation from './pushOperation';
 
 interface Options {
   issue?: string;

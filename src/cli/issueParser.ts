@@ -1,7 +1,7 @@
-import { exec } from 'flow/cli/shell';
+import { exec } from './shell';
 import inquirer from 'inquirer';
 
-function validateIssueKey(input: string): true | string {
+export function validateIssueKey(input: string): true | string {
   const message = 'The issue key format is not valid.';
 
   return /^[A-Za-z]+-[0-9]+$/.test(input) || message;

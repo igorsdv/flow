@@ -1,6 +1,8 @@
-import * as watson from 'flow/cli/watson';
-import { IssueDetails } from 'flow/client/jira';
+import * as watson from './cli/watson';
+import { IssueDetails } from './client/jira';
 import moment from 'moment';
+import { validateIssueKey } from './cli/issueParser';
+import yaml from 'js-yaml';
 
 export interface ValidatedIssue {
   key: string;
@@ -89,30 +91,81 @@ const smartRound = (mins: number): number => (
 
 function renderFrame(frame: ValidatedFrame): string[] {
   const { issue: { key, summary, error }, start, stop } = frame;
-  const lines = [
-    summary ? `# ${summary.length > 76 ? `${summary.substring(0, 76)}...` : summary}` : null,
-    error ? `ERROR: ${error}` : null,
-    `${key}:`,
+  const header = summary
+    ? [`# ${summary.length > 76 ? `${summary.substring(0, 73)}...` : summary}`]
+    : [];
+  const interval = [start, stop].map((time) => time.format('k:mm')).join(' - ');
+
+  return [
+    ...header,
+    `- issue: ${key}${error ? ` # ${error}` : ''}`,
     ...indent(2, [
-      `time: ${smartRound(stop.diff(start, 'minutes'))}`,
+      `time: ${smartRound(stop.diff(start, 'minutes'))} # ${interval}`,
       'description: .',
     ]),
   ];
-
-  return lines.filter((line) => line !== null) as string[];
 }
 
-export function renderFrames(framesByDate: Map<string, ValidatedFrame[]>): string[] {
+export function renderFrames(framesByDate: Map<string, ValidatedFrame[]>): string {
   const header = ['# Don\'t forget to fill the descriptions!', ''];
 
   return [...framesByDate.entries()].reduce((lines, [date, frames]) => [
     ...lines,
-    '',
     `${date}: # ${moment(date).format('dddd')}`,
     ...indent(2, frames.reduce((lines: string[], frame: ValidatedFrame) => [
       ...lines,
+      ...renderFrame(frame),
       '',
-      ...indent(2, renderFrame(frame)),
     ], [])),
-  ], header);
+  ], header).join('\n');
+}
+
+export interface ParsedFrame {
+  issue: string;
+  time: number;
+  description: string;
+}
+
+export function parseFrames(text: string): ParsedFrame[] {
+  const doc = yaml.safeLoad(text, { schema: yaml.JSON_SCHEMA });
+
+  if (typeof doc !== 'object' || Array.isArray(doc)) {
+    throw new Error('expected object at top-level');
+  }
+
+  return [...Object.entries(doc)].reduce((result: ParsedFrame[], [date, frames]) => {
+    const parsedDate = moment(date, 'YYYY-MM-DD');
+
+    if (!parsedDate.isValid()) {
+      throw new Error(`expected valid date, got: ${date}`);
+    }
+
+    if (!Array.isArray(frames)) {
+      throw new Error(`expected array of frames, got: ${frames}`);
+    }
+
+    const parsedFrames = frames.map((frame: {
+      issue: unknown;
+      time: unknown;
+      description: object | string | number | undefined | null;
+    }) => {
+      const { issue, time, description } = frame;
+
+      if (typeof issue !== 'string' || validateIssueKey(issue) !== true) {
+        throw new Error(`missing or invalid issue key for frame: ${frame}`);
+      }
+
+      if (typeof time !== 'number' || time <= 0) {
+        throw new Error(`missing or invalid time for frame: ${frame}`);
+      }
+
+      if (description === undefined || description === null || description.toString() === '') {
+        throw new Error(`missing description for frame: ${frame}`);
+      }
+
+      return { issue, time, description: description.toString() };
+    });
+
+    return [...result, ...parsedFrames];
+  }, []);
 }
