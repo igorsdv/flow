@@ -58,6 +58,7 @@ export async function push(): Promise<void> {
     frames = watson.getPendingFrames();
   } catch (e) {
     watson.showInstallationHelp();
+
     return;
   }
 

@@ -1,11 +1,13 @@
-import * as watson from './cli/watson';
+import { Frame } from './cli/watson';
 import { IssueDetails } from './client/jira';
 import moment from 'moment';
+import util from 'util';
 import { validateIssueKey } from './cli/issueParser';
 import yaml from 'js-yaml';
 
 export interface ValidatedIssue {
   key: string;
+  accountId?: number;
   summary?: string;
   error?: string;
 }
@@ -16,7 +18,7 @@ export interface ValidatedFrame {
   stop: moment.Moment;
 }
 
-function validateIssues(
+export function validateIssues(
   issueKeys: Set<string>,
   issueDetails: Map<string, IssueDetails>,
   openAccountIds: Set<number>,
@@ -33,36 +35,26 @@ function validateIssues(
       error = `${key} is associated to a closed or archived Tempo account`;
     }
 
-    return [key, { key, summary: issue?.summary, error }];
+    return [key, { key, accountId: issue?.account?.id, summary: issue?.summary, error }];
   }));
 }
 
-function getValidationErrors(issues: Iterable<ValidatedIssue>): string[] {
-  return Array.from(issues, ({ error }) => error)
-    .filter((error) => error !== undefined) as string[];
+export function getValidationErrors(issues: Iterable<ValidatedIssue>): Map<string, string> {
+  return new Map(
+    [...issues].filter(({ error }) => error !== undefined)
+      .map(({ key, error }) => [key, error as string]),
+  );
 }
 
-interface FrameValidationResult {
-  validatedFrames: ValidatedFrame[];
-  errors: string[];
-}
-
-export function validateFrames(
-  frames: watson.Frame[],
-  issueDetails: Map<string, IssueDetails>,
-  openAccountIds: Set<number>,
-): FrameValidationResult {
-  const issueKeys = new Set(frames.map(({ project }) => project));
-  const validatedIssues = validateIssues(issueKeys, issueDetails, openAccountIds);
-
-  return {
-    validatedFrames: frames.map(({ project, start, stop }) => ({
-      issue: validatedIssues.get(project) as ValidatedIssue,
-      start,
-      stop,
-    })),
-    errors: getValidationErrors(validatedIssues.values()),
-  };
+export function getValidatedFrames(
+  frames: Frame[],
+  validatedIssues: Map<string, ValidatedIssue>,
+): ValidatedFrame[] {
+  return frames.map(({ project, start, stop }) => ({
+    issue: validatedIssues.get(project) as ValidatedIssue,
+    start,
+    stop,
+  }));
 }
 
 export function groupFramesByDate(frames: ValidatedFrame[]): Map<string, ValidatedFrame[]> {
@@ -122,6 +114,7 @@ export function renderFrames(framesByDate: Map<string, ValidatedFrame[]>): strin
 
 export interface ParsedFrame {
   issue: string;
+  date: moment.Moment;
   time: number;
   description: string;
 }
@@ -137,11 +130,11 @@ export function parseFrames(text: string): ParsedFrame[] {
     const parsedDate = moment(date, 'YYYY-MM-DD');
 
     if (!parsedDate.isValid()) {
-      throw new Error(`expected valid date, got: ${date}`);
+      throw new Error(`expected valid date, got: ${util.inspect(date)}`);
     }
 
     if (!Array.isArray(frames)) {
-      throw new Error(`expected array of frames, got: ${frames}`);
+      throw new Error(`expected array of frames, got: ${util.inspect(frames)}`);
     }
 
     const parsedFrames = frames.map((frame: {
@@ -152,18 +145,18 @@ export function parseFrames(text: string): ParsedFrame[] {
       const { issue, time, description } = frame;
 
       if (typeof issue !== 'string' || validateIssueKey(issue) !== true) {
-        throw new Error(`missing or invalid issue key for frame: ${frame}`);
+        throw new Error(`missing or invalid issue key for frame: ${util.inspect(frame)}`);
       }
 
       if (typeof time !== 'number' || time <= 0) {
-        throw new Error(`missing or invalid time for frame: ${frame}`);
+        throw new Error(`missing or invalid time for frame: ${util.inspect(frame)}`);
       }
 
       if (description === undefined || description === null || description.toString() === '') {
-        throw new Error(`missing description for frame: ${frame}`);
+        throw new Error(`missing description for frame: ${util.inspect(frame)}`);
       }
 
-      return { issue, time, description: description.toString() };
+      return { issue, date: parsedDate, time, description: description.toString() };
     });
 
     return [...result, ...parsedFrames];
