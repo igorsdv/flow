@@ -21,17 +21,18 @@
     ],
     "rules": {
         "func-names": "off",
+        "class-methods-use-this": "off",
         "import/no-unresolved": "off",
         "import/order": "off",
-        "import/prefer-default-export": "off",
-        "no-console": "off",
         "no-mixed-operators": "off",
         "no-nested-ternary": "off",
         "no-restricted-syntax": "off",
+        "no-return-assign": ["error", "except-parens"],
         "no-shadow": "off",
         "object-curly-newline": ["error", {
             "consistent": true
-        }],
-        "sort-imports": "error"
+            }],
+        "sort-imports": "error",
+        "@typescript-eslint/no-empty-interface": "off"
     }
 }

@@ -1,24 +1,29 @@
-import moment from 'moment';
-import Entity from '../core/Entity';
 import Result from '../core/Result';
-import BaseError from '../core/BaseError';
+import ValueObject from '../core/ValueObject';
+import WorklogDuration from './WorklogDuration';
+import WorklogMoment from './WorklogMoment';
 
-interface WorklogProps {
-  issueKey: string;
-  description: string;
-  duration: moment.Duration;
+interface Worklog {
+  readonly issueKey: string;
+  readonly description: string;
+  readonly duration: WorklogDuration;
+  readonly moment: WorklogMoment;
 }
 
-const validateIssueKey = (issueKey: string) => /^[A-Z]+-[0-9]+$/.test(issueKey)
+class Worklog extends ValueObject<Worklog> {
+  static create(props: Worklog): Result<Worklog> {
+    const { issueKey, description } = props;
 
-export default class Worklog extends Entity<WorklogProps> {
-  static create({ issueKey, description, duration }: WorklogProps): Result<Worklog> {
-    if (!validateIssueKey(issueKey)) {
-      return Result.err(new InvalidIssueKeyError())
+    if (!/^[A-Z]+-[0-9]+$/.test(issueKey)) {
+      return Result.err(new Error('The issue key is invalid.'));
     }
 
-    return new Worklog({})
+    if (description === '') {
+      return Result.err(new Error('The description is required.'));
+    }
+
+    return Result.ok(new Worklog(props));
   }
 }
 
-export class InvalidIssueKeyError extends BaseError {}
+export default Worklog;
