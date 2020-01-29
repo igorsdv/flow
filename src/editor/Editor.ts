@@ -44,7 +44,7 @@ export default class Editor implements ContextualizedFrameMapper {
       }
 
       // eslint-disable-next-line no-await-in-loop
-      if (!await this.input.confirmProceed('Open for editing again?')) {
+      if (!await this.input.confirm('Open for editing again?')) {
         throw new Error('Push aborted');
       }
     }

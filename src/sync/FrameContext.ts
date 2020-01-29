@@ -20,8 +20,8 @@ export default class FrameContext {
   getContextualizedFrames(): ContextualizedFrame[] {
     return this.frames.map((frame) => {
       const { project: issueKey, start, end } = frame;
-      const issueSummary = this.issues.get(issueKey)?.summary ?? null;
-      const issueError = this.warnings.get(issueKey)?.message ?? null;
+      const issueSummary = this.issues.get(issueKey)?.summary || null;
+      const issueError = this.warnings.get(issueKey)?.message || null;
       const description = '.';
 
       return ContextualizedFrame.create(

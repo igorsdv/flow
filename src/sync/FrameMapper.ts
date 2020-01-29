@@ -57,6 +57,6 @@ export default class FrameMapper {
 
     this.output.write('\n');
 
-    return this.input.confirmProceed('Do you wish to proceed?');
+    return this.input.confirm('Do you wish to proceed?');
   }
 }
