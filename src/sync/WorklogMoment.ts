@@ -13,4 +13,8 @@ export default class WorklogMoment {
 
     return Result.ok(new WorklogMoment(worklogMoment));
   }
+
+  asDate(): string {
+    return this.moment.format('YYYY-MM-DD');
+  }
 }

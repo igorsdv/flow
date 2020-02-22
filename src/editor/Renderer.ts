@@ -32,12 +32,11 @@ function renderFramesByDate(framesByDate: Map<string, ContextualizedFrame[]>): R
   const header = ['# Don\'t forget to fill the descriptions!', ''];
   const content = [...framesByDate.entries()].flatMap(([date, frames]) => [
     `${date}: # ${moment(date).format('dddd')}`,
-    // Add emoty line after each frame
+    // Add empty line after each frame
     frames.flatMap((frame) => [...renderFrame(frame), '']),
   ]);
 
-  // Remove last empty line
-  return [...header, ...content].slice(0, -1);
+  return [...header, ...content];
 }
 
 function renderItem(item: RenderedItem, indent = 0): string {
@@ -54,6 +53,9 @@ function renderItem(item: RenderedItem, indent = 0): string {
 
 export default class Renderer {
   static renderFrames(framesByDate: Map<string, ContextualizedFrame[]>): string {
-    return renderFramesByDate(framesByDate).map((item) => renderItem(item)).join('');
+    return renderFramesByDate(framesByDate)
+      .map((item) => renderItem(item))
+      .join('')
+      .slice(0, -1); // Remove last empty line
   }
 }

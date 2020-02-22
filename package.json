@@ -40,6 +40,7 @@
     "flow": "bin/flow.js"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   }
 }
