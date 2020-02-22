@@ -1,12 +1,15 @@
 import { Arguments, CommandModule } from 'yargs';
 import FrameController from '../tracking/FrameController';
+import Input from '../io/Input';
 import Output from '../io/Output';
 import ProjectContext from './ProjectContext';
+import chalk from 'chalk';
 
 export default class StartCommand implements CommandModule {
   constructor(
     private projectContext: ProjectContext,
     private frameController: FrameController,
+    private input: Input,
     private output: Output,
   ) {}
 
@@ -22,16 +25,17 @@ export default class StartCommand implements CommandModule {
   };
 
   readonly handler = async (args: Arguments<{ issue?: string }>): Promise<void> => {
-    const issue = args.issue || await this.projectContext.getProject();
-
-    if (issue === null) {
-      throw new Error('No issue provided.');
-    }
+    const issue = args.issue && args.issue.toUpperCase()
+      || await this.projectContext.getProject()
+      || await this.input.prompt({
+        message: 'Please enter the issue key:',
+        filter: (input) => input.toUpperCase(),
+      });
 
     const frame = await this.frameController.start(issue, ({ project }) => {
-      this.output.write(`Stopped work on issue ${project}.\n`);
+      this.output.write(`Stopped work on project ${chalk.cyan(project)}.\n`);
     });
 
-    this.output.write(`Started work on issue ${frame.project}.\n`);
+    this.output.write(`Started work on project ${chalk.cyan(frame.project)}.\n`);
   };
 }

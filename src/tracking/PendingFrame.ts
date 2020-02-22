@@ -28,6 +28,6 @@ export default class PendingFrame extends Entity<PendingFrameProps> {
   }
 
   complete(): Result<Frame> {
-    return Frame.create({ end: moment(), ...this.props });
+    return Frame.create({ end: moment(), ...this.props }, this.id);
   }
 }

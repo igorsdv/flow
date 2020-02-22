@@ -3,6 +3,9 @@ import leveldown from 'leveldown';
 import stream from 'stream';
 import util from 'util';
 
+type BatchOperation =
+  { type: 'put'; key: string; value: string } | { type: 'del'; key: string };
+
 const finished = util.promisify(stream.finished);
 
 export default class LevelDb {
@@ -37,6 +40,10 @@ export default class LevelDb {
 
   async put(key: string, value: string): Promise<void> {
     return this.db.put(key, value);
+  }
+
+  async batch(ops: BatchOperation[]): Promise<void> {
+    return this.db.batch(ops);
   }
 
   async deleteBatch(keys: string[]): Promise<void> {

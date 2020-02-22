@@ -57,14 +57,50 @@ export default class LevelDbFrameRepository implements FrameRepository {
   }
 
   async save(frame: Frame | PendingFrame): Promise<void> {
-    const value: SerializedFrame = {
+    const serializedFrame: SerializedFrame = {
       id: frame.id,
       project: frame.project,
       start: frame.start.toISOString(true),
       end: frame instanceof Frame ? frame.end.toISOString(true) : null,
     };
 
-    return this.db.put(FRAME_KEY_PREFIX + frame.id, JSON.stringify(value));
+    const key = FRAME_KEY_PREFIX + frame.id;
+    const value = JSON.stringify(serializedFrame);
+
+    if (frame instanceof Frame) {
+      const currentKey = await this.db.get(CURRENT_FRAME_KEY);
+
+      if (currentKey === key) {
+        return this.stopCurrentFrame(key, value);
+      }
+
+      return this.db.put(key, value);
+    }
+
+    return this.startCurrentFrame(key, value);
+  }
+
+  private async startCurrentFrame(key: string, value: string): Promise<void> {
+    return this.db.batch([{
+      type: 'put' as const,
+      key: CURRENT_FRAME_KEY,
+      value: key,
+    }, {
+      type: 'put' as const,
+      key,
+      value,
+    }]);
+  }
+
+  private async stopCurrentFrame(key: string, value: string): Promise<void> {
+    return this.db.batch([{
+      type: 'del' as const,
+      key: CURRENT_FRAME_KEY,
+    }, {
+      type: 'put' as const,
+      key,
+      value,
+    }]);
   }
 
   async delete(ids: string[]): Promise<void> {
