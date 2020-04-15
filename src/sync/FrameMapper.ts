@@ -2,6 +2,7 @@ import ContextualizedFrameMapper from './ContextualizedFrameMapper';
 import Frame from '../tracking/Frame';
 import FrameContext from './FrameContext';
 import Input from '../io/Input';
+import NamedError from '../core/NamedError';
 import Output from '../io/Output';
 import Synchronizer from './Synchronizer';
 import Worklog from './Worklog';
@@ -15,6 +16,10 @@ export default class FrameMapper {
   ) {}
 
   async mapFrames(frames: Frame[]): Promise<Worklog[]> {
+    if (frames.length === 0) {
+      return [];
+    }
+
     this.output.write('Validating pending issues... ');
 
     const context = await this.createFrameContext(frames);
@@ -22,9 +27,7 @@ export default class FrameMapper {
     const proceed = await this.shouldProceedWithWarnings(warnings);
 
     if (!proceed) {
-      this.output.write('Push aborted.\n');
-
-      return [];
+      throw NamedError.createUserAbortError();
     }
 
     const contextualizedFrames = context.getContextualizedFrames();
@@ -33,9 +36,12 @@ export default class FrameMapper {
   }
 
   private async createFrameContext(frames: Frame[]): Promise<FrameContext> {
-    const projects = new Set(frames.map(({ project }) => project));
+    const projects = frames
+      .map(({ project }) => project)
+      .filter((project) => /[A-Z]+-[0-9]+/.test(project));
+
     const [issues, openAccountIds] = await Promise.all([
-      this.synchronizer.getIssuesByKeys([...projects]),
+      this.synchronizer.getIssuesByKeys([...new Set(projects)]),
       this.synchronizer.getOpenAccountIds(),
     ]);
 
@@ -52,11 +58,11 @@ export default class FrameMapper {
     this.output.write('Found the following errors:\n');
 
     for (const warning of warnings) {
-      this.output.write(`- ${warning}\n`);
+      this.output.write(`- ${warning.message}\n`);
     }
 
     this.output.write('\n');
 
-    return this.input.confirm('Do you wish to proceed?');
+    return this.input.confirm('Do you wish to proceed?', false);
   }
 }

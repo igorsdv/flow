@@ -20,7 +20,7 @@ export default class Frame extends Entity<FrameProps> {
       return Result.err(new Error('The time range is invalid.'));
     }
 
-    return Result.ok(new Frame({ project, ...props }, id));
+    return Result.ok(new Frame({ ...props, project }, id));
   }
 
   get project(): string {

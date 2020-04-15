@@ -2,11 +2,12 @@ import Input, { Question } from './Input';
 import inquirer from 'inquirer';
 
 export default class InquirerInput implements Input {
-  async confirm(message: string): Promise<boolean> {
+  async confirm(message: string, defaultValue = true): Promise<boolean> {
     const { result } = await inquirer.prompt({
       name: 'result',
       type: 'confirm',
       message,
+      default: defaultValue,
     });
 
     return result;

@@ -8,6 +8,6 @@ export interface Question<T> {
 }
 
 export default interface Input {
-  confirm(message: string): Promise<boolean>;
+  confirm(message: string, defaultValue?: boolean): Promise<boolean>;
   prompt<T>(question: Question<T>): Promise<T>;
 }

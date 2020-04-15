@@ -15,7 +15,7 @@ class Worklog extends ValueObject<Worklog> {
     const { issueKey, description } = props;
 
     if (!/^[A-Z]+-[0-9]+$/.test(issueKey)) {
-      return Result.err(new Error('The issue key is invalid.'));
+      return Result.err(new Error(`The issue key ${issueKey} is invalid.`));
     }
 
     if (description === '') {

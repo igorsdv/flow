@@ -35,4 +35,8 @@ export default class WorklogDuration {
   asHours(): number {
     return this.duration.asHours();
   }
+
+  asSeconds(): number {
+    return this.duration.asSeconds();
+  }
 }

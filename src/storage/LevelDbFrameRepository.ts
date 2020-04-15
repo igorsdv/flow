@@ -2,6 +2,7 @@ import Frame from '../tracking/Frame';
 import FrameRepository from '../tracking/FrameRepository';
 import LevelDb from './LevelDb';
 import PendingFrame from '../tracking/PendingFrame';
+import StorageSettingsProvider from './StorageSettingsProvider';
 import moment from 'moment';
 
 const CURRENT_FRAME_KEY = 'current-frame';
@@ -17,8 +18,8 @@ interface SerializedFrame {
 export default class LevelDbFrameRepository implements FrameRepository {
   private db: LevelDb;
 
-  constructor() {
-    this.db = new LevelDb('/tmp/flow'); // TODO change
+  constructor(settingsProvider: StorageSettingsProvider) {
+    this.db = new LevelDb(settingsProvider.getLevelDbPath());
   }
 
   async getCurrent(): Promise<PendingFrame | null> {

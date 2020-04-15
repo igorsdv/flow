@@ -15,7 +15,7 @@ class Ok<T, E> {
     return this.value;
   }
 
-  then<U, F>(f: (arg: T) => Result<U, F>): Result<U, E | F> {
+  map<U, F>(f: (arg: T) => Result<U, F>): Result<U, E | F> {
     return f(this.value);
   }
 }
@@ -36,7 +36,7 @@ class Err<T, E> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  then<U, F>(this: Err<U, E>, _f: (arg: T) => Result<U, F>): Result<U, E | F> {
+  map<U, F>(this: Err<U, E>, _f: (arg: T) => Result<U, F>): Result<U, E | F> {
     return this;
   }
 }

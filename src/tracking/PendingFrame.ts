@@ -16,7 +16,7 @@ export default class PendingFrame extends Entity<PendingFrameProps> {
       return Result.err(new Error('The project name is required.'));
     }
 
-    return Result.ok(new PendingFrame({ project, ...props }, id));
+    return Result.ok(new PendingFrame({ ...props, project }, id));
   }
 
   get project(): string {
@@ -28,6 +28,6 @@ export default class PendingFrame extends Entity<PendingFrameProps> {
   }
 
   complete(): Result<Frame> {
-    return Frame.create({ end: moment(), ...this.props }, this.id);
+    return Frame.create({ ...this.props, end: moment() }, this.id);
   }
 }

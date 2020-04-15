@@ -92,8 +92,8 @@ function createWorklog(date: string, draftWorklog: DraftWorklog): Result<Worklog
 export default class Parser {
   static parseWorklogs(text: string): Result<Worklog[]> {
     return loadYamlDoc(text)
-      .then(parseDraftWorklogs)
-      .then((draftWorklogsByDate: DraftWorklogsByDate) => {
+      .map(parseDraftWorklogs)
+      .map((draftWorklogsByDate: DraftWorklogsByDate) => {
         const worklogs = Object.entries(draftWorklogsByDate).flatMap(([date, draftWorklogs]) => (
           draftWorklogs.map((draftWorklog) => createWorklog(date, draftWorklog))
         ));

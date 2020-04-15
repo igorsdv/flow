@@ -1,6 +1,7 @@
 import ContextualizedFrame from '../sync/ContextualizedFrame';
 import ContextualizedFrameMapper from '../sync/ContextualizedFrameMapper';
 import Input from '../io/Input';
+import NamedError from '../core/NamedError';
 import Output from '../io/Output';
 import Parser from './Parser';
 import Renderer from './Renderer';
@@ -35,7 +36,7 @@ export default class Editor implements ContextualizedFrameMapper {
 
       text = edit(text, { postfix: '.yml' });
 
-      this.output.write('\r');
+      this.output.clearLine();
 
       try {
         return Parser.parseWorklogs(text).getOrThrow();
@@ -45,7 +46,7 @@ export default class Editor implements ContextualizedFrameMapper {
 
       // eslint-disable-next-line no-await-in-loop
       if (!await this.input.confirm('Open for editing again?')) {
-        throw new Error('Push aborted');
+        throw NamedError.createUserAbortError();
       }
     }
   }
