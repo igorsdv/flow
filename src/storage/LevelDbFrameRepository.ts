@@ -22,6 +22,26 @@ export default class LevelDbFrameRepository implements FrameRepository {
     this.db = new LevelDb(settingsProvider.getLevelDbPath());
   }
 
+  async get(id: string): Promise<Frame | null> {
+    const value = await this.db.get(FRAME_KEY_PREFIX + id);
+
+    if (value === null) {
+      return null;
+    }
+
+    const frame: SerializedFrame = JSON.parse(value);
+
+    if (frame.end !== null) {
+      return Frame.create({
+        project: frame.project,
+        start: moment(frame.start, moment.ISO_8601),
+        end: moment(frame.end as string, moment.ISO_8601),
+      }, frame.id).getOrThrow();
+    }
+
+    return null;
+  }
+
   async getCurrent(): Promise<PendingFrame | null> {
     const key = await this.db.get(CURRENT_FRAME_KEY);
 

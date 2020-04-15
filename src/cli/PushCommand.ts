@@ -18,7 +18,7 @@ export default class PushCommand implements CommandModule {
 
   readonly command = 'push';
 
-  readonly describe = 'Push pending worklogs';
+  readonly describe = 'Push stopped worklogs';
 
   readonly handler = async (): Promise<void> => {
     try {
