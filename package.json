@@ -41,7 +41,7 @@
     "flow": "bin/flow.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p src/",
     "test": "jest"
   }
 }

@@ -1,8 +1,11 @@
 import JiraSettingsProvider from '../jira/JiraSettingsProvider';
 import StorageSettingsProvider from '../storage/StorageSettingsProvider';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({
+  path: path.resolve(__dirname, '../../.env'),
+});
 
 function getFromEnvironment(variable: string): string {
   const value = process.env[variable];
