@@ -43,6 +43,12 @@ See the available commands:
 flow --help
 ```
 
+#### Special features
+
+`flow start` without an argument will start a worklog corresponding to the Jira issue number in the checked out Git branch.
+
+`flow push` will round your outstanding worklogs to the nearest 15-minute interval and open a text editor for you to add worklog descriptions and make adjustments before pushing to Tempo.
+
 ## License
 
 This project is licensed under the MIT License.
