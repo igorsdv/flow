@@ -1,6 +1,7 @@
 import { CommandModule } from 'yargs';
 import FrameController from '../tracking/FrameController';
 import Output from '../io/Output';
+import chalk from 'chalk';
 
 export default class StopCommand implements CommandModule {
   constructor(
@@ -18,7 +19,7 @@ export default class StopCommand implements CommandModule {
     if (frame === null) {
       this.output.write('There is no pending work.\n');
     } else {
-      this.output.write(`Stopped work on issue ${frame.project}.\n`);
+      this.output.write(`Stopped work on project ${chalk.cyan(frame.project)}.\n`);
     }
   };
 }
